@@ -18,12 +18,48 @@ npm run preview  # serve the built site
 
 Push to `main` → `.github/workflows/deploy.yml` builds and publishes to GitHub Pages.
 
-One-time GitHub setup:
-1. Create the repo (`fugitivelabs/samplify-web`) and push this directory.
-2. **Settings → Pages → Source: GitHub Actions.**
-3. Custom domain `samplify.pro`: the `public/CNAME` file is already committed; point the
-   domain's DNS at GitHub Pages (apex `A`/`AAAA` records, or a `CNAME` for `www`), then
-   check "Enforce HTTPS" once the cert provisions.
+One-time GitHub setup (done):
+1. Repo `fugitivelabs/samplify-web` created and pushed.
+2. **Settings → Pages → Source: GitHub Actions** (enabled).
+
+### Custom domain — samplify.pro
+
+The site is built for the apex domain (`base: '/'`), so it renders correctly only at
+`samplify.pro`, not the temporary `fugitivelabs.github.io/samplify-web/` preview (there
+the root-relative `/_astro/…` asset paths 404 — expected, not a bug).
+
+**1. Add these DNS records at the samplify.pro registrar.**
+
+Apex (`@`) `A` records → GitHub Pages:
+
+```
+185.199.108.153
+185.199.109.153
+185.199.110.153
+185.199.111.153
+```
+
+Apex (`@`) `AAAA` records → GitHub Pages (IPv6):
+
+```
+2606:50c0:8000::153
+2606:50c0:8001::153
+2606:50c0:8002::153
+2606:50c0:8003::153
+```
+
+Optional `www` subdomain — `CNAME` `www` → `fugitivelabs.github.io.`
+
+**2. Set the custom domain.** After DNS resolves, either commit `public/CNAME`
+(`samplify.pro`, already present) and redeploy, or set it in **Settings → Pages →
+Custom domain** / via the API:
+
+```bash
+gh api --method PUT repos/fugitivelabs/samplify-web/pages -f cname='samplify.pro'
+```
+
+**3. Enforce HTTPS.** Once GitHub provisions the TLS cert (minutes to ~1 hour), check
+**Settings → Pages → Enforce HTTPS**.
 
 ## Editing the site
 
