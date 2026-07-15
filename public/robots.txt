@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://samplify.pro/sitemap-index.xml
+Sitemap: https://samplifypro.com/sitemap-index.xml

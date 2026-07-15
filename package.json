@@ -1,7 +1,7 @@
 {
   "name": "samplify-website",
   "version": "1.0.0",
-  "description": "samplify.pro — marketing site for Samplify Pro",
+  "description": "samplifypro.com — marketing site for Samplify Pro",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
@@ -16,7 +16,7 @@
   "author": "Fugitive Labs",
   "license": "UNLICENSED",
   "private": true,
-  "homepage": "https://samplify.pro",
+  "homepage": "https://samplifypro.com",
   "dependencies": {
     "@astrojs/sitemap": "^3.7.0",
     "@astrojs/tailwind": "^6.0.2",
