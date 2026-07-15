@@ -1,0 +1,13 @@
+---
+// Samplify mark: three offset rounded squares — a stack of flooring sample chips.
+export interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<svg viewBox="0 0 48 48" fill="none" aria-hidden="true" class={className}>
+  <rect x="4" y="14" width="24" height="24" rx="5" fill="currentColor" opacity="0.35" />
+  <rect x="12" y="10" width="24" height="24" rx="5" fill="currentColor" opacity="0.6" />
+  <rect x="20" y="6" width="24" height="24" rx="5" fill="currentColor" />
+</svg>

@@ -1,0 +1,107 @@
+---
+import Base from '../layouts/Base.astro';
+import Mark from '../components/Mark.astro';
+
+const email = 'hello@samplify.pro';
+
+const stages = [
+  {
+    label: 'Sampled',
+    body: 'A rep photographs the sample label at checkout — something they already do. OCR turns it into a structured order record. No inventory setup, no typing.',
+  },
+  {
+    label: 'Engaged',
+    body: 'An automatic SMS sequence qualifies the lead in the customer’s own words: “How’s the oak looking in the kitchen? Want us to come measure?” Replies land in a shared inbox.',
+  },
+  {
+    label: 'Measure requested',
+    body: 'The customer says yes. Samplify notifies the assigned rep and records the handoff. The sample comes back at the measure — retrieval is a byproduct, not the pitch.',
+  },
+  {
+    label: 'Handed off',
+    body: 'Won or lost, one tap, with reason codes on lost. Everything feeds the owner’s dashboard: pipeline value, conversion by stage, which products convert, which reps close.',
+  },
+];
+---
+
+<Base
+  title="Samplify — the sample that logs itself"
+  description="Samplify turns the samples a flooring store already sends home into a self-logging sales pipeline — from 'sample left the building' to 'measure scheduled' — with zero data entry by reps."
+>
+  <div class="mx-auto flex min-h-screen max-w-5xl flex-col px-6 sm:px-10">
+    <header class="flex items-center justify-between py-8">
+      <a href="/" class="flex items-center gap-3 text-oak transition-opacity hover:opacity-70">
+        <Mark class="h-7 w-auto" />
+        <span class="font-mono text-sm font-semibold uppercase tracking-[0.2em] text-ink">
+          Samplify
+        </span>
+      </a>
+      <a
+        href={`mailto:${email}?subject=Samplify%20pilot`}
+        class="font-mono text-xs text-muted underline decoration-muted/40 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink sm:text-sm"
+      >
+        Book a pilot
+      </a>
+    </header>
+
+    <main class="flex flex-1 flex-col justify-center py-14 sm:py-20">
+      <p class="font-mono text-xs uppercase tracking-[0.28em] text-oak">
+        Sample-to-sale for flooring retail
+      </p>
+
+      <h1 class="mt-8 max-w-4xl text-4xl font-semibold leading-[1.1] tracking-tight sm:text-6xl">
+        The sample that
+        <span class="text-oak">logs itself.</span>
+      </h1>
+
+      <p class="mt-8 max-w-2xl text-lg leading-relaxed text-muted sm:text-xl">
+        A sample that leaves the showroom isn’t a liability to recover — it’s a live
+        sales presentation running in a customer’s home. Samplify turns the samples a
+        flooring store already sends out into a self-logging pipeline, from
+        “sample left the building” to “measure scheduled,” with zero data entry by reps.
+      </p>
+
+      <div class="mt-12 flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-8">
+        <a
+          href={`mailto:${email}?subject=Samplify%20pilot`}
+          class="inline-flex w-fit items-center gap-3 bg-oak px-7 py-4 font-mono text-sm font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:-translate-y-0.5"
+        >
+          <Mark class="h-4 w-auto" />
+          Book a pilot
+        </a>
+        <p class="font-mono text-sm text-muted">
+          Flooring stores · live in under 30 minutes.
+        </p>
+      </div>
+
+      <div class="mt-20 border-t border-ink/10 pt-12">
+        <p class="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+          The pipeline Samplify owns
+        </p>
+        <div class="mt-10 grid gap-10 sm:grid-cols-2 sm:gap-x-12 sm:gap-y-12">
+          {
+            stages.map((stage, i) => (
+              <section class="flex gap-5">
+                <span class="font-mono text-sm text-oak">{String(i + 1).padStart(2, '0')}</span>
+                <div>
+                  <h2 class="text-lg font-semibold tracking-tight">{stage.label}</h2>
+                  <p class="mt-3 text-sm leading-relaxed text-muted">{stage.body}</p>
+                </div>
+              </section>
+            ))
+          }
+        </div>
+      </div>
+    </main>
+
+    <footer class="flex flex-col gap-3 border-t border-ink/10 py-8 font-mono text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+      <p>Samplify · a Fugitive Labs product · Durham, North Carolina</p>
+      <a
+        href={`mailto:${email}`}
+        class="underline decoration-muted/40 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+      >
+        {email}
+      </a>
+    </footer>
+  </div>
+</Base>
