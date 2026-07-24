@@ -1,0 +1,259 @@
+---
+/**
+ * Shared shell for the legal documents (/privacy, /terms).
+ *
+ * These pages exist because App Store Connect and the Play Data Safety form both
+ * require a reachable policy URL before a build can be submitted, and Stripe
+ * expects terms at checkout. They live on the marketing site rather than in the
+ * app so the URL keeps resolving independently of a product deploy — third
+ * parties check these on their schedule, not ours.
+ *
+ * The routes and links are wired; the BODIES ARE DELIBERATELY EMPTY. Each
+ * section carries a `note` describing what it has to cover, derived from the
+ * data flows that actually exist in ../app (capture path, SMS engine, billing
+ * rail, storage policies) — guidance for whoever writes the copy, never
+ * customer-facing text.
+ *
+ * To publish: write EVERY section body, then set `published: true` and an
+ * `effective` date in src/legal-docs.mjs (the single source of truth, which the
+ * sitemap exclusion is also derived from). While unpublished the page renders a
+ * loud draft banner and is marked noindex; publishing with any section still
+ * unwritten fails the build rather than shipping notes as policy text.
+ */
+import Base from './Base.astro';
+import Mark from '../components/Mark.astro';
+
+export interface Section {
+  title: string;
+  /**
+   * What this section must cover. Rendered in place of the body while the
+   * document is unpublished; publishing with any body still missing is a build
+   * error, so a note can never reach a reader as operative policy text.
+   */
+  note: string;
+  /** The operative policy copy, as HTML. Undefined until counsel supplies it. */
+  body?: string;
+}
+
+export interface Props {
+  title: string;
+  summary: string;
+  /** ISO date (YYYY-MM-DD) the document takes effect; null until published. */
+  effective: string | null;
+  published: boolean;
+  sections: Section[];
+}
+
+const { title, summary, effective, published, sections } = Astro.props;
+
+/**
+ * Publishing is all-or-nothing, enforced at build time.
+ *
+ * `published` used to gate only the draft banner and the noindex tag, while the
+ * per-section fallback keyed off `body` independently. Writing 9 of 11 sections
+ * and flipping the flag therefore shipped an indexable, banner-free policy whose
+ * remaining sections rendered their internal counsel notes as operative prose.
+ * Failing the deploy is the only reliable guard — a half-published legal
+ * document must never reach an app-store reviewer.
+ */
+const missing = sections.filter((s) => !s.body).map((s) => s.title);
+if (published && missing.length > 0) {
+  throw new Error(
+    `${title}: cannot publish with ${missing.length} unwritten section(s) — ${missing.join(', ')}. ` +
+      `Write every section body, or set published: false in src/legal-docs.mjs.`
+  );
+}
+if (published && !effective) {
+  throw new Error(`${title}: cannot publish without an effective date — set it in src/legal-docs.mjs.`);
+}
+
+const effectiveLabel = effective
+  ? new Date(`${effective}T00:00:00Z`).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC',
+    })
+  : 'Not yet in effect';
+
+const email = 'hello@samplifypro.com';
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+---
+
+<Base title={`${title} — Samplify`} description={summary} noindex={!published}>
+  <div class="mx-auto flex min-h-screen max-w-3xl flex-col px-6 sm:px-10">
+    <header class="flex items-center justify-between py-8">
+      <a href="/" class="flex items-center gap-3 text-oak transition-opacity hover:opacity-70">
+        <Mark class="h-7 w-auto" />
+        <span class="font-mono text-sm font-semibold uppercase tracking-[0.2em] text-ink">
+          Samplify
+        </span>
+      </a>
+      <a
+        href="/"
+        class="font-mono text-xs text-muted underline decoration-muted/40 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink sm:text-sm"
+      >
+        Back to site
+      </a>
+    </header>
+
+    <main class="flex-1 py-10 sm:py-14">
+      <h1 class="text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">{title}</h1>
+      <p class="mt-6 max-w-2xl text-lg leading-relaxed text-muted">{summary}</p>
+      <p class="mt-6 font-mono text-xs uppercase tracking-[0.2em] text-muted">
+        Effective {effectiveLabel}
+      </p>
+
+      {/* role="note", not "alert": alert is a live region for content injected
+          after load, and screen-reader handling of a load-time alert is
+          inconsistent. This is the one signal telling a non-sighted reader the
+          document is not operative, so it is labelled instead. */}
+      {
+        !published && (
+          <div class="mt-10 border-l-2 border-oak bg-oak/5 px-6 py-5" role="note" aria-labelledby="draft-notice">
+            <p id="draft-notice" class="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-oak">
+              Draft — not a published policy
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-muted">
+              This document has no operative text yet. The headings below are a skeleton of what it
+              needs to cover; the copy is still to be written and reviewed by counsel. Do not submit
+              this URL to an app store listing, a billing flow, or any customer-facing surface until
+              it is complete.
+            </p>
+          </div>
+        )
+      }
+
+      <nav class="mt-12 border-t border-ink/10 pt-8" aria-label={`${title} sections`}>
+        <p class="font-mono text-xs uppercase tracking-[0.2em] text-muted">Contents</p>
+        <ol class="mt-5 grid gap-2 sm:grid-cols-2">
+          {
+            sections.map((s, i) => (
+              <li class="flex gap-3 text-sm">
+                <span class="font-mono text-xs text-oak">{String(i + 1).padStart(2, '0')}</span>
+                <a
+                  href={`#${slug(s.title)}`}
+                  class="underline decoration-muted/30 underline-offset-4 transition-colors hover:text-oak hover:decoration-oak"
+                >
+                  {s.title}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+
+      <div class="mt-14 flex flex-col gap-12 border-t border-ink/10 pt-12">
+        {
+          sections.map((s, i) => (
+            <section id={slug(s.title)} class="flex gap-5">
+              <span class="font-mono text-sm text-oak">{String(i + 1).padStart(2, '0')}</span>
+              <div class="min-w-0">
+                <h2 class="text-lg font-semibold tracking-tight">{s.title}</h2>
+                {s.body ? (
+                  <div class="prose-legal mt-4 text-sm leading-relaxed text-muted" set:html={s.body} />
+                ) : (
+                  <p class="mt-4 text-sm leading-relaxed text-muted">
+                    <span class="mr-2 inline-block bg-ink/5 px-2 py-1 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-ink/60">
+                      To be written
+                    </span>
+                    {s.note}
+                  </p>
+                )}
+              </div>
+            </section>
+          ))
+        }
+      </div>
+    </main>
+
+    <footer
+      class="flex flex-col gap-3 border-t border-ink/10 py-8 font-mono text-xs text-muted sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>Samplify · a Fugitive Labs product · Durham, North Carolina</p>
+      <div class="flex gap-4">
+        <a
+          href="/privacy"
+          class="underline decoration-muted/40 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+        >
+          Privacy
+        </a>
+        <a
+          href="/terms"
+          class="underline decoration-muted/40 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+        >
+          Terms
+        </a>
+        <a
+          href={`mailto:${email}`}
+          class="underline decoration-muted/40 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+        >
+          {email}
+        </a>
+      </div>
+    </footer>
+  </div>
+</Base>
+
+<style is:global>
+  /* Counsel supplies section bodies as raw HTML (set:html), so Tailwind's
+     content scanner never sees those tags — they need real element styles.
+     Scoped to .prose-legal so nothing else on the site is affected. */
+  .prose-legal > * + * {
+    margin-top: 1rem;
+  }
+  .prose-legal strong {
+    font-weight: 600;
+    color: theme('colors.ink');
+  }
+  .prose-legal a {
+    color: theme('colors.oak');
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .prose-legal ul,
+  .prose-legal ol {
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .prose-legal ul {
+    list-style: disc;
+  }
+  .prose-legal ol {
+    list-style: decimal;
+  }
+  /* `> * + *` above is direct-children only, so paragraphs nested in a list
+     item would collapse together under preflight's margin reset. */
+  .prose-legal li > * + * {
+    margin-top: 0.5rem;
+  }
+  /* Preflight sets every heading to inherit its size, so an h3 in an injected
+     body would render at body size and read flat. */
+  .prose-legal h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: theme('colors.ink');
+    margin-top: 1.5rem;
+  }
+  /* Counsel is asked to tabulate the sub-processor list (and Play's Data Safety
+     reviewers expect that shape), but preflight leaves tables borderless. */
+  .prose-legal table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+  }
+  .prose-legal th,
+  .prose-legal td {
+    border: 1px solid theme('colors.ink / 15%');
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  .prose-legal th {
+    font-weight: 600;
+    color: theme('colors.ink');
+    background: theme('colors.ink / 4%');
+  }
+</style>

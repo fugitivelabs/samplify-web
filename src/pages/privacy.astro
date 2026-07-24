@@ -1,0 +1,73 @@
+---
+import Legal from '../layouts/Legal.astro';
+import type { Section } from '../layouts/Legal.astro';
+import { LEGAL_DOCS } from '../legal-docs.mjs';
+
+/**
+ * Publish state lives in src/legal-docs.mjs so the sitemap exclusion derives
+ * from the same flag. Publishing with any section body still unwritten is a
+ * build error — see Legal.astro. This URL is what goes into App Store Connect
+ * and the Play Data Safety form.
+ */
+const { published, effective } = LEGAL_DOCS['/privacy/'];
+
+/**
+ * Section skeleton. Every note below describes a data flow that actually exists
+ * in the product — derived by reading the capture path, the SMS engine, the
+ * billing rail, and the storage policies in ../app, not from a generic template.
+ */
+const sections: Section[] = [
+  {
+    title: 'Who we are',
+    note: 'Identify the operating entity (Fugitive Labs, LLC, DBA "Samplify Pro" — this is the identity submitted to and approved by Twilio toll-free verification, so it must match exactly), its jurisdiction, and a contact address. Explain the two-audience structure: flooring retailers are the customers who hold accounts, and their showroom customers are people whose contact details flow through the product without ever having an account.',
+  },
+  {
+    title: 'Information we collect',
+    note: 'Four distinct buckets. (1) Store account data: name, email, password, role, plus the business details collected during onboarding — legal name, business type, EIN, street address, and website. (2) Photographs of flooring sample labels captured by reps, stored as image objects. (3) Showroom-customer data entered by reps or received in replies: mobile number, first and last name, optional email, text-message consent state, and the full two-way message history. (4) Product and usage telemetry: app events, cold-start timings, scan counts, and pipeline stage transitions.',
+  },
+  {
+    title: 'How we use information',
+    note: 'Cover: running optical character recognition on label photographs to identify products; creating and advancing orders through the sales pipeline; sending the automated qualification text sequence and routing replies to the store; producing the owner dashboard, rep scorecards, and weekly digest email; billing and usage metering; and product analytics. Be explicit that label photographs are transmitted to a third-party model provider for OCR — that is the least obvious flow and the one most worth disclosing plainly.',
+  },
+  {
+    title: 'Text messaging',
+    note: 'This section carries real compliance weight — it is the substance the carriers verified during toll-free verification. Cover: consent is collected in person by a store representative as a separate, optional, affirmative step and is never bundled with taking a sample home; message frequency and that message and data rates may apply; STOP, START, and HELP keyword handling; and that an opt-out cannot be reversed by the store. Cross-reference the per-store opt-in disclosure the app serves at /sms-optin.',
+  },
+  {
+    title: 'Service providers',
+    note: 'Name every sub-processor that receives data and state what each one gets: Supabase (database, authentication, image storage), Anthropic (label photographs submitted for OCR), Twilio (mobile numbers and message bodies for SMS delivery), Stripe (store billing and payment data), Resend (email addresses for invitations, digests, and transactional mail), Expo (device push tokens), and Vercel (application hosting and request logs). State whether any of them may use the data for their own purposes.',
+  },
+  {
+    title: 'Data retention and deletion',
+    note: 'State how long each category is kept. Describe the account-deletion behavior the product actually implements: a rep who deletes their account has their sign-in disabled and their name and device push token scrubbed, while the orders and scans they created remain with the store as its business records. Explain separately what happens to a store\'s data when it cancels, and how a store requests full deletion.',
+  },
+  {
+    title: 'Your choices and rights',
+    note: 'Cover how a store owner and a rep each exercise access, correction, and deletion. Address separately how a showroom customer whose number is in the system makes a request, given that they have no account and no way to sign in — this is the gap most policies handle badly. Then address whichever state privacy regimes apply based on where stores operate.',
+  },
+  {
+    title: 'Security',
+    note: 'Describe the controls without overstating them. Accurate as implemented today: per-tenant isolation enforced at the database layer rather than in application code, encryption in transit, scoped access credentials, and label images served through short-lived signed URLs rather than public links.',
+  },
+  {
+    title: "Children's privacy",
+    note: 'Standard statement that the service is not directed to children and is intended for business use by flooring retailers and their staff.',
+  },
+  {
+    title: 'Changes to this policy',
+    note: 'How material changes are communicated to stores and when they take effect.',
+  },
+  {
+    title: 'Contact us',
+    note: 'A monitored address for privacy requests. This needs to be a real, watched inbox before launch — it is the address app-store reviewers and customers will actually use.',
+  },
+];
+---
+
+<Legal
+  title="Privacy Policy"
+  summary="How Samplify collects, uses, and shares information about stores, their representatives, and their customers."
+  effective={effective}
+  published={published}
+  sections={sections}
+/>
