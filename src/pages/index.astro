@@ -96,12 +96,26 @@ const stages = [
 
     <footer class="flex flex-col gap-3 border-t border-ink/10 py-8 font-mono text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
       <p>Samplify · a Fugitive Labs product · Durham, North Carolina</p>
-      <a
-        href={`mailto:${email}`}
-        class="underline decoration-muted/40 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
-      >
-        {email}
-      </a>
+      <div class="flex gap-4">
+        <a
+          href="/privacy"
+          class="underline decoration-muted/40 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+        >
+          Privacy
+        </a>
+        <a
+          href="/terms"
+          class="underline decoration-muted/40 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+        >
+          Terms
+        </a>
+        <a
+          href={`mailto:${email}`}
+          class="underline decoration-muted/40 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+        >
+          {email}
+        </a>
+      </div>
     </footer>
   </div>
 </Base>

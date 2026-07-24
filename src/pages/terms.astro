@@ -1,0 +1,84 @@
+---
+import Legal from '../layouts/Legal.astro';
+import type { Section } from '../layouts/Legal.astro';
+import { LEGAL_DOCS } from '../legal-docs.mjs';
+
+/**
+ * Publish state lives in src/legal-docs.mjs so the sitemap exclusion derives
+ * from the same flag. Publishing with any section body still unwritten is a
+ * build error — see Legal.astro. Stripe expects a reachable terms URL.
+ */
+const { published, effective } = LEGAL_DOCS['/terms/'];
+
+/**
+ * Section skeleton. The notes reflect how the product actually behaves —
+ * the 60-day pre-checkout trial, the plan allowances, the consent obligation
+ * that sits with the store, and the shared-responsibility split on SMS.
+ */
+const sections: Section[] = [
+  {
+    title: 'Agreement to these terms',
+    note: 'Identify the contracting entity (Fugitive Labs, LLC), state that use of the service constitutes acceptance, and note that the person accepting must have authority to bind the store.',
+  },
+  {
+    title: 'The service',
+    note: 'Describe what Samplify does in operative terms: a mobile app for capturing flooring sample checkouts, automated SMS follow-up to the store\'s customers, and a web dashboard reporting the resulting pipeline. Reserve the right to change functionality.',
+  },
+  {
+    title: 'Accounts and eligibility',
+    note: 'Business use only. Cover the two roles the product implements — owners, who hold billing and settings authority, and reps, who are invited by an owner. State that the store is responsible for its reps\' activity and for removing access when someone leaves.',
+  },
+  {
+    title: 'Your responsibilities for customer consent',
+    note: 'The most important section in this document, and the one that protects you. Make it unambiguous that the store — not Samplify — is responsible for obtaining valid, affirmative, documented consent from each customer before texting them, and for the accuracy of the numbers it enters. Reference the required separate, optional, non-bundled consent step. State the consequences of violating it, including suspension.',
+  },
+  {
+    title: 'Fees, trial, and billing',
+    note: 'Reflect the implemented model: a 60-day free trial that begins before any payment method is collected, then a monthly subscription. Cover plan allowances and what happens when a store exceeds them, billing through Stripe, renewal, failed payment and the past-due state, and the cancellation and refund policy.',
+  },
+  {
+    title: 'Acceptable use',
+    note: 'Prohibit texting people who have not consented, uploading unlawful content, reselling or sharing access, probing or circumventing tenant isolation, and automated or scripted use of the capture endpoints. Note that per-rep rate limits exist and that automation trips them.',
+  },
+  {
+    title: 'Data ownership',
+    note: 'State that the store owns its own business data — orders, scans, customers, and messages — and that Samplify holds a license to process it in order to run the service. Address aggregated and de-identified use if you intend to do it, and say so plainly if you do.',
+  },
+  {
+    title: 'Third-party services',
+    note: 'Note that the service depends on third parties (carriers, Twilio, Stripe, Anthropic, Supabase, Apple, Google) and disclaim responsibility for their outages, message delivery failures, and carrier filtering — SMS delivery is genuinely not guaranteeable, and this should say so.',
+  },
+  {
+    title: 'Disclaimers',
+    note: 'Service provided as-is. Specifically disclaim warranties around OCR accuracy and message deliverability, both of which are probabilistic in practice and will occasionally be wrong.',
+  },
+  {
+    title: 'Limitation of liability',
+    note: 'Standard cap and exclusion of consequential damages. Counsel should set the cap relative to fees paid.',
+  },
+  {
+    title: 'Termination',
+    note: 'How either side ends the agreement, what notice is given, what happens to store data afterward and for how long it can be exported, and the grounds for immediate suspension (most relevantly, an SMS consent violation).',
+  },
+  {
+    title: 'Changes to these terms',
+    note: 'How changes are communicated and when continued use constitutes acceptance.',
+  },
+  {
+    title: 'Governing law and disputes',
+    note: 'Jurisdiction and venue — North Carolina, unless counsel advises otherwise. Include the dispute-resolution posture, and any arbitration or class-waiver terms if you want them.',
+  },
+  {
+    title: 'Contact us',
+    note: 'A monitored address for legal and contractual notices.',
+  },
+];
+---
+
+<Legal
+  title="Terms of Service"
+  summary="The agreement between Fugitive Labs and the flooring stores that use Samplify."
+  effective={effective}
+  published={published}
+  sections={sections}
+/>
